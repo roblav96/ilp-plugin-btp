@@ -111,6 +111,15 @@ export class WebSocketReconnector extends EventEmitter2 {
     this.emit('close')
     this._instance.close()
   }
+  
+  private _heartbeatId: number
+  heartbeat () {
+    clearTimeout(this._heartbeatId)
+    if (this._instance && this._instance.readyState == this._instance.OPEN) {
+      this._instance.send('ping')
+      this._heartbeatId = setTimeout(this.heartbeat, 5000)
+    }
+  }
 
   /**
    * Triggered on `close` or `error` event from `open ()`. If triggered, all
